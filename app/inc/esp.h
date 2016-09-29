@@ -32,9 +32,25 @@ typedef struct{
         uint8_t (*test_internet)();
         uint8_t (*test_ap)();
         uint8_t (*reset_until_ready)();
-        uint8_t (*send_to_TCP)(char *message,char *specific_answer,char *ip, char *port);
-        uint8_t (*fnct_send_to_TCP)(void (*other_send_function)(),
-                uint16_t message_length,char *specific_answer,char *ip,char *port);
+
+        uint8_t (*send_to_TCP)
+                (char *message,
+                char *specific_answer,
+                char *ip,
+                char *port);
+
+        uint8_t (*fnct_send_to_TCP)
+                (void (*other_send_function)(),
+                uint16_t message_length,
+                char *specific_answer,
+                char *ip,
+                char *port);
+
+        char *(*fnct_send_field_to_TCP_return_answer)
+                (void (*other_send_function)(),
+                uint16_t message_length,
+                char *ip,
+                char *port);
 
         void (*esp_on)();
         void (*esp_off)();

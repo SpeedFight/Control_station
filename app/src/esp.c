@@ -152,6 +152,38 @@ static uint8_t esp_accept_comand(char *string_to_send,char *ok_string, uint8_t w
 }
 
 /**
+ * @brief send given message by uart, and return answer
+ */
+static char *esp_accept_comand_return_answer(char *string_to_send, uint8_t wait_time)
+{
+    for(uint8_t try=0;try<MAX_TRY;try++)
+    {
+        clear_input_buff();
+        send_uart(string_to_send);
+
+        for(uint32_t try_time=0;try_time<((uint32_t)wait_time*10000);try_time++)
+        {
+            _delay_us(100);
+            if(*received_data_pack_flag)
+            {
+                try_time=0;
+                for(;try_time<((uint32_t)wait_time*10000);try_time++)
+                {
+                    _delay_us(100);
+
+                }
+                return input_buff;
+            }
+        }
+        //if(!(try%4))
+            //reset();
+
+        //_delay_ms(1500);
+    }
+    return 0;
+}
+
+/**
  * @brief send given message by uart, and wait to specific answer, if false don't reset
  */
 static uint8_t esp_accept_comand_one_try(char *string_to_send,char *ok_string, uint8_t wait_time)
@@ -380,11 +412,34 @@ char *port)
         return 0;
 
     other_send_function();
-    send_uart("\r\n");
-    if (!(esp_accept_comand("\0",specific_answer,13)))
+    //send_uart("\r\n");
+    if (!(esp_accept_comand("\r\n",specific_answer,13)))
         return 0;
 
     return 1;
+}
+
+//function return answer return from thingspeak talkback
+static char *fnct_send_field_to_TCP_return_answer(void (*other_send_function)(),
+uint16_t message_length,
+char *ip,
+char *port)
+{
+    char size_string[4];//={'0','0','0','\0'};
+
+    itoa ((message_length+2), size_string, 10);
+
+    if (!(log_to_TCP(ip,port)))
+        return 0;   //if error
+
+    send_uart("AT+CIPSEND=");
+    send_uart(size_string);
+    //send_uart("\r\n");
+    if (!(esp_accept_comand("\r\n","OK",2)))
+        return 0;
+
+    other_send_function();
+    return esp_accept_comand_return_answer("\r\n",2); //pointer to input buffer which collect specific answer given by thingspeak talkback
 }
 
 void esp_on()
@@ -426,6 +481,7 @@ void esp_off()
         esp->reset_until_ready=&reset_until_ready;
         esp->send_to_TCP=&send_field_to_TCP;
         esp->fnct_send_to_TCP=&fnct_send_field_to_TCP;
+        esp->fnct_send_field_to_TCP_return_answer=&fnct_send_field_to_TCP_return_answer;
 
         esp->esp_on=&esp_on;
         esp->esp_off=&esp_off;
