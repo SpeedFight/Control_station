@@ -426,6 +426,7 @@ char *ip,
 char *port)
 {
     char size_string[4];//={'0','0','0','\0'};
+    static char answer[20];
 
     itoa ((message_length+2), size_string, 10);
 
@@ -439,7 +440,10 @@ char *port)
         return 0;
 
     other_send_function();
-    return esp_accept_comand_return_answer("\r\n",2); //pointer to input buffer which collect specific answer given by thingspeak talkback
+
+    return strcpy(answer,esp_accept_comand_return_answer("\r\n",2));
+    //return esp_accept_comand_return_answer("\r\n",2); //pointer to input buffer which collect specific answer given by thingspeak talkback
+
 }
 
 void esp_on()

@@ -156,26 +156,25 @@ static void send_post(void){
     #endif
 }
 
-
 /**
  * @brief Init function
  */
 #ifdef DATA_FIELD_1
-void thingspeak_init_struct(void (*uart_send_function)(char *),
+void thingspeak_init_struct_and_data(void (*uart_send_function)(char *),
                                 thingspeak_typedef *thingspeak_struct,
                                 data_field_typedef *data1)
 #endif
 
 
 #ifdef DATA_FIELD_2
-void thingspeak_init_struct(void (*uart_send_function)(char *),
+void thingspeak_init_struct_and_data(void (*uart_send_function)(char *),
                                 thingspeak_typedef *thingspeak_struct,
                                 data_field_typedef *data1,
                                 data_field_typedef *data2)
 #endif
 
 #ifdef DATA_FIELD_3
-void thingspeak_init_struct(void (*uart_send_function)(char *),
+void thingspeak_init_struct_and_data(void (*uart_send_function)(char *),
                                 thingspeak_typedef *thingspeak_struct,
                                 data_field_typedef *data1,
                                 data_field_typedef *data2,
@@ -183,7 +182,7 @@ void thingspeak_init_struct(void (*uart_send_function)(char *),
 #endif
 
 #ifdef DATA_FIELD_4
-void thingspeak_init_struct(void (*uart_send_function)(char *),
+void thingspeak_init_struct_and_data(void (*uart_send_function)(char *),
                                 thingspeak_typedef *thingspeak_struct,
                                 data_field_typedef *data1,
                                 data_field_typedef *data2,
@@ -216,3 +215,18 @@ void thingspeak_init_struct(void (*uart_send_function)(char *),
 
 }
 //↓↓↓↓↓↓thingspeak talkback part //receiver
+
+void thingspeak_init_struct(void (*uart_send_function)(char *),
+                                thingspeak_typedef *thingspeak_struct)
+{
+    uart_send=uart_send_function;
+
+    thingspeak=thingspeak_struct;
+    thingspeak_struct->post_message_length=&post_message_length;
+    thingspeak_struct->send_post=&send_post;
+}
+
+void thingspeak_set_channel(thingspeak_typedef *thingspeak_struct)
+{
+    thingspeak=thingspeak_struct;
+}

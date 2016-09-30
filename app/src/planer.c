@@ -19,8 +19,9 @@
 #include <stdlib.h>
 
 //#define CZUJNIK1
-#define CZUJNIK2
+//#define CZUJNIK2
 //#define CZUJNIK3
+#define TALKBACK
 
 //#define IRQ_TIMER
 
@@ -42,12 +43,21 @@ const char port[]="80";
     const char api_key[]="DKQUPX8IRUS6SHQJ";
 #endif
 
+#ifdef TALKBACK
+    const char talkback_id[]="9837";
+    const char api_key[]="G1PGOIQUKDE5182Y";
+
+#endif
+
 ///
+
+#if defined(CZUJNIK1) || defined(CZUJNIK2) || defined(CZUJNIK3)
 static char str_temperature[4];
 static char str_humidity[4];
 
 int8_t no_temperature, no_humidity;
 int8_t tmp_temp, tmp_hum;
+#endif
 
 #ifdef IRQ_TIMER
     typedef struct
@@ -161,15 +171,10 @@ int8_t tmp_temp, tmp_hum;
 
 uint8_t main_activity()
 {
-    //init uart
     comm_typedef uart;
     uart_init_struct(&uart);
     uart.init();
 
-    //init photoresistor
-    photoresistor_typedef photoresistor;
-    photoresistor_init_struct(&photoresistor);
-    photoresistor.init();
 
     //init esp
     esp_typedef esp;
@@ -180,12 +185,19 @@ uint8_t main_activity()
             uart.received_data_pack_flag,
             &esp);
 
+#if defined(CZUJNIK1) || defined(CZUJNIK2) || defined(CZUJNIK3)
+
     thingspeak_typedef thingspeak={
         .ip=ip,
         .port=port,
         .channel_id=channel_id,
         .api_key=api_key
     };
+
+    //init photoresistor
+    photoresistor_typedef photoresistor;
+    photoresistor_init_struct(&photoresistor);
+    photoresistor.init();
 
     #ifdef CZUJNIK1
     data_field_typedef temperature=	{.field_no="1"};
@@ -208,11 +220,13 @@ uint8_t main_activity()
     temperature.field_value=str_temperature;
     humidity.field_value=str_humidity;
 
-    thingspeak_init_struct(uart.send,
+    thingspeak_init_struct_and_data(uart.send,
                             &thingspeak,
                             &temperature,
                             &humidity,
                             &light);
+#endif
+
 #ifdef IRQ_TIMER
     start_timer();
 #endif
@@ -223,10 +237,73 @@ uint8_t main_activity()
     //char tmppp[4];
 
     uint8_t ile=0;
-    wdt_enable(WDTO_2S);
+#ifdef TALKBACK
 
+while (1)
+{
+    for(uint8_t i=0;i<4;i++)//wait loop ~1600ms
+    {
+        //wdt_reset();
+        _delay_ms(400);
+        uart.send("minute++\n\r");
+        ile++;
+    }
+
+    if(ile>149u)//co 5min
+    {
+        ile=0;
+
+        *uart.received_data_pack_flag=0;
+        uart.send("esp start\n\r");
+        esp.esp_on();
+
+        //wdt_reset();
+        if((esp.reset_until_ready()))
+        {
+
+        }
+        //wdt_reset();
+        //wdt_disable();
+        *uart.received_data_pack_flag=0;
+
+        if(esp.test_ap())
+        {
+
+        }
+        *uart.received_data_pack_flag=0;
+
+        _delay_ms(1000);
+        if(esp.test_internet())
+        {
+
+        }
+        *uart.received_data_pack_flag=0;
+
+        //wdt_enable(WDTO_2S);
+/*
+        if( atoi(fnct_send_field_to_TCP_return_answer(void (*other_send_function)(),
+        uint16_t message_length,
+        ip,
+        port)))
+
+        if(esp.fnct_send_to_TCP(thingspeak.send_post,
+            thingspeak.post_message_length(),
+            "+IPD,",ip,port))
+            {
+
+            }
+*/
+        esp.esp_off();
+        uart.send("esp end\n\r");
+
+    }
+}
+#endif
+
+#ifdef SENSOR
     while(1)
     {
+        wdt_enable(WDTO_2S);
 
         for(uint8_t i=0;i<4;i++)//wait loop ~1600ms
         {
@@ -334,9 +411,12 @@ uint8_t main_activity()
 
                 }
 
+
+
             esp.esp_off();
             uart.send("esp end\n\r");
 
         }
     }
+    #endif
 }

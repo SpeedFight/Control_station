@@ -55,6 +55,11 @@ typedef struct{
 
  }thingspeak_typedef;
 
+void thingspeak_init_struct(void (*uart_send_function)(char *),
+                                 thingspeak_typedef *thingspeak_struct);
+
+void thingspeak_set_channel(thingspeak_typedef *thingspeak_struct);
+
 
 /**
  * @addtogroup data_fiel_definitions
@@ -72,21 +77,21 @@ typedef struct{
 
 
  #ifdef DATA_FIELD_1
- void thingspeak_init_struct(void (*uart_send_function)(char *),
+ void thingspeak_init_struct_and_data(void (*uart_send_function)(char *),
                                 thingspeak_typedef *thingspeak_struct,
                                  data_field_typedef *data1);
  #endif
 
 
  #ifdef DATA_FIELD_2
- void thingspeak_init_struct(void (*uart_send_function)(char *),
+ void thingspeak_init_struct_and_data(void (*uart_send_function)(char *),
                                 thingspeak_typedef *thingspeak_struct,
                                  data_field_typedef *data1,
                                  data_field_typedef *data2);
  #endif
 
  #ifdef DATA_FIELD_3
- void thingspeak_init_struct(void (*uart_send_function)(char *),
+ void thingspeak_init_struct_and_data(void (*uart_send_function)(char *),
                                 thingspeak_typedef *thingspeak_struct,
                                  data_field_typedef *data1,
                                  data_field_typedef *data2,
@@ -94,7 +99,7 @@ typedef struct{
  #endif
 
  #ifdef DATA_FIELD_4
- void thingspeak_init_struct(void (*uart_send_function)(char *),
+ void thingspeak_init_struct_and_data(void (*uart_send_function)(char *),
                                 thingspeak_typedef *thingspeak_struct,
                                  data_field_typedef *data1,
                                  data_field_typedef *data2,
@@ -137,7 +142,7 @@ typedef struct{
   	data_field_typedef pressure=	{.field_no="3"};
   	data_field_typedef light=		{.field_no="4"};
 
-  	thingspeak_init_struct(uart.send,
+  	thingspeak_init_struct_and_data(uart.send,
   							&thingspeak,
   							&temperature,
   							&humidity,
