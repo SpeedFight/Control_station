@@ -53,6 +53,10 @@ typedef struct{
      uint16_t (*post_message_length)();
      void (*send_post)();
 
+     uint8_t (*talkback_request_message_length)();
+     void (*send_request_talkback)();
+
+
  }thingspeak_typedef;
 
 void thingspeak_init_struct(void (*uart_send_function)(char *),
@@ -74,6 +78,8 @@ void thingspeak_set_channel(thingspeak_typedef *thingspeak_struct);
  //#define DATA_FIELD_2
  #define DATA_FIELD_3
  //#define DATA_FIELD_4
+
+ #define TALKBACK
 
 
  #ifdef DATA_FIELD_1

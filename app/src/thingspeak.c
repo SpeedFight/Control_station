@@ -5,6 +5,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define TALKBACK
+
 /**
  * @addtogroup thingsepak_def
  * @{
@@ -34,10 +36,17 @@ thingspeak_typedef *thingspeak; //pointer to struct contain ip,port etc...
  * @brief part of message for thingspeak
  * @{
  */
-static const char thingspeak_GET_http[]="GET https://api.thingspeak.com/";
-static const char thingspeak_Update_api_key[]="update?api_key=";
-static const char thingspeak_field[]="&field";
 
+#if defined(DATA_FIELD_1) || defined(DATA_FIELD_2) || defined(DATA_FIELD_3) || defined(DATA_FIELD_4)
+    static const char thingspeak_GET_http[]="GET https://api.thingspeak.com/";
+    static const char thingspeak_Update_api_key[]="update?api_key=";
+    static const char thingspeak_field[]="&field";
+#endif
+
+#ifdef TALKBACK
+    static const char thingsepak_talkback[]="/talkbacks/";
+    static const char thingsepak_command_execute[]="/commands/execute?api_key=";
+#endif
 static uint8_t (*uart_send)(char *message); //pointer to uart send function
 /** @}*/
 
@@ -216,17 +225,41 @@ void thingspeak_init_struct_and_data(void (*uart_send_function)(char *),
 }
 //↓↓↓↓↓↓thingspeak talkback part //receiver
 
+
+void thingspeak_set_channel(thingspeak_typedef *thingspeak_struct)
+{
+    thingspeak=thingspeak_struct;
+}
+
+static uint8_t talkback_request_message_length(){
+    uint8_t length;
+    length=size_of_string("GET ");
+    length+=size_of_string(thingsepak_talkback);
+    length+=size_of_string(thingspeak->channel_id);
+    length+=size_of_string(thingsepak_command_execute);
+    length+=size_of_string(thingspeak->api_key);
+
+    return length;
+}
+//GET /talkbacks/<TALKBACK_ID>/commands/execute?api_key=<YOUR_TALKBACK_API_KEY>
+static void send_request_talkback(void){
+    uart_send("GET ");
+    uart_send(thingsepak_talkback);
+    uart_send(thingspeak->channel_id);
+    uart_send(thingsepak_command_execute);
+    uart_send(thingspeak->api_key);
+}
+
 void thingspeak_init_struct(void (*uart_send_function)(char *),
-                                thingspeak_typedef *thingspeak_struct)
+thingspeak_typedef *thingspeak_struct)
 {
     uart_send=uart_send_function;
 
     thingspeak=thingspeak_struct;
     thingspeak_struct->post_message_length=&post_message_length;
     thingspeak_struct->send_post=&send_post;
-}
 
-void thingspeak_set_channel(thingspeak_typedef *thingspeak_struct)
-{
-    thingspeak=thingspeak_struct;
+    thingspeak_struct->talkback_request_message_length=&talkback_request_message_length;
+    thingspeak_struct->send_request_talkback=&send_request_talkback;
+
 }
