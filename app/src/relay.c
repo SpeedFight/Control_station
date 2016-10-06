@@ -41,3 +41,10 @@ static inline void off()
 {
     RELAY_OFF;
 }
+
+void relay_init_struct(relay_typedef *relay)
+{
+    configure_relay();
+    relay->on=&on;
+    relay->off=&off;
+}

@@ -230,6 +230,18 @@ uint8_t main_activity()
                             &temperature,
                             &humidity,
                             &light);
+
+#else
+
+    thingspeak_typedef thingspeak={
+        .ip=ip,
+        .port=port,
+        .channel_id=talkback_id,
+        .api_key=api_key
+    };
+
+    relay_typedef relay;    //configure relay
+    relay_init_struct(&relay);
 #endif
 
 #ifdef IRQ_TIMER
@@ -246,6 +258,19 @@ uint8_t main_activity()
 
 while (1)
 {
+
+    while(1) //////////////////////////////////////////////////test
+    {
+        uart.send(
+        esp.fnct_send_field_to_TCP_return_answer
+        (thingspeak.send_request_talkback,
+        thingspeak.talkback_request_message_length(),
+        ip,
+        port)
+        );
+
+    }
+
     for(uint8_t i=0;i<4;i++)//wait loop ~1600ms
     {
         //wdt_reset();
@@ -285,19 +310,15 @@ while (1)
         *uart.received_data_pack_flag=0;
 
         //wdt_enable(WDTO_2S);
-/*
-        if( atoi(fnct_send_field_to_TCP_return_answer(void (*other_send_function)(),
-        uint16_t message_length,
-        ip,
-        port)))
+        if(atoi(
+            esp.fnct_send_field_to_TCP_return_answer
+                    (thingspeak.send_request_talkback,
+                    thingspeak.talkback_request_message_length(),
+                    ip,
+                    port)
+                ));
 
-        if(esp.fnct_send_to_TCP(thingspeak.send_post,
-            thingspeak.post_message_length(),
-            "+IPD,",ip,port))
-            {
 
-            }
-*/
         esp.esp_off();
         uart.send("esp end\n\r");
 
@@ -415,7 +436,6 @@ while (1)
                 {
 
                 }
-
 
 
             esp.esp_off();
