@@ -16,6 +16,8 @@
 #if defined(CZUJNIK1) || defined(CZUJNIK2) || defined(CZUJNIK3)
 #include "../inc/photoresistor.h"
 #include "../inc/dht.h"
+#else
+    #include "../inc/relay.h"
 #endif
 
 #include <string.h>
