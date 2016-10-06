@@ -11,9 +11,12 @@
 #include "../inc/uart.h"
 #include "../inc/esp.h"
 #include "../inc/thingspeak.h"
+#include "../inc/planer.h"
+
+#if defined(CZUJNIK1) || defined(CZUJNIK2) || defined(CZUJNIK3)
 #include "../inc/photoresistor.h"
 #include "../inc/dht.h"
-#include "../inc/planer.h"
+#endif
 
 #include <string.h>
 #include <stdlib.h>
