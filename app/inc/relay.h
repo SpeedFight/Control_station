@@ -7,6 +7,8 @@
 #ifndef _relay_h
 #define _relay_h
 
+#include <avr/io.h>
+
 typedef struct
 {
     void (*on)();
