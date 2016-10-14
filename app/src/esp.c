@@ -213,6 +213,20 @@ static uint8_t esp_accept_comand_one_try(char *string_to_send,char *ok_string, u
     return 0;
 }
 
+static uint8_t connect_to_wifi(char *ssid, char *pass)
+{
+    //AT+CWJAP="ssid","pass"
+    send_uart("AT+CWJAP=\"");
+    send_uart(ssid);
+    send_uart("\",\"");
+    send_uart(pass);
+    send_uart("\"");
+    if(esp_accept_comand("\r\n","OK",5))
+        return 1;
+    else
+        return 0;
+}
+
 static uint8_t reset_until_ready()
 {
     reset();
@@ -489,4 +503,6 @@ void esp_off()
 
         esp->esp_on=&esp_on;
         esp->esp_off=&esp_off;
+
+        esp->connect_to_wifi=&connect_to_wifi;
 }

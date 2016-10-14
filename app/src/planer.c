@@ -256,9 +256,41 @@ uint8_t main_activity()
     uint8_t ile=0;
 #ifdef TALKBACK
 
-while (1)
+
+*uart.received_data_pack_flag=0;
+uart.send("esp start\n\r");
+esp.esp_on();
+
+//wdt_reset();
+if((esp.reset_until_ready()))
 {
 
+}
+//wdt_reset();
+//wdt_disable();
+*uart.received_data_pack_flag=0;
+
+esp.connect_to_wifi("Dziewczyny","031878");
+
+*uart.received_data_pack_flag=0;
+
+if(esp.test_ap())
+{
+
+}
+*uart.received_data_pack_flag=0;
+
+_delay_ms(1000);
+if(esp.test_internet())
+{
+
+}
+*uart.received_data_pack_flag=0;
+
+
+while (1)
+{
+/*
     while(1) //////////////////////////////////////////////////test
     {
         uart.send("w petli\n\r");
@@ -284,57 +316,36 @@ while (1)
             uart.send("LED_toogle\n\r");
         }
     }
-
-    for(uint8_t i=0;i<4;i++)//wait loop ~1600ms
-    {
+*/
         //wdt_reset();
-        _delay_ms(400);
-        uart.send("minute++\n\r");
+        _delay_ms(500);
         ile++;
-    }
 
-    if(ile>149u)//co 5min
+    if(ile>4u)//co 2sekudny
     {
         ile=0;
 
-        *uart.received_data_pack_flag=0;
-        uart.send("esp start\n\r");
-        esp.esp_on();
-
-        //wdt_reset();
-        if((esp.reset_until_ready()))
-        {
-
-        }
-        //wdt_reset();
-        //wdt_disable();
-        *uart.received_data_pack_flag=0;
-
-        if(esp.test_ap())
-        {
-
-        }
-        *uart.received_data_pack_flag=0;
-
-        _delay_ms(1000);
-        if(esp.test_internet())
-        {
-
-        }
-        *uart.received_data_pack_flag=0;
-
         //wdt_enable(WDTO_2S);
-        if(atoi(
-            esp.fnct_send_field_to_TCP_return_answer
-                    (thingspeak.send_request_talkback,
-                    thingspeak.talkback_request_message_length(),
-                    ip,
-                    port)
-                ));
+        uint8_t ans =atoi(
+        esp.fnct_send_field_to_TCP_return_answer
+        (thingspeak.send_request_talkback,
+        thingspeak.talkback_request_message_length(),
+        ip,
+        port)
+        );
 
-
-        esp.esp_off();
-        uart.send("esp end\n\r");
+        if(ans==1)
+        {
+            uart.send("LED_on\n\r");
+        }
+        if(ans==2)
+        {
+            uart.send("LED_off\n\r");
+        }
+        if(ans==3)
+        {
+            uart.send("LED_toogle\n\r");
+        }
 
     }
 }

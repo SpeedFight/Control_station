@@ -54,6 +54,8 @@ typedef struct{
 
         void (*esp_on)();
         void (*esp_off)();
+
+        uint8_t (*connect_to_wifi)(char *ssid, char *pass);
 }esp_typedef;
 
 /**
