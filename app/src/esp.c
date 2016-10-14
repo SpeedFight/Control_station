@@ -427,12 +427,12 @@ char *port)
 {
     char size_string[4];//={'0','0','0','\0'};
     static char answer[20];
-
     itoa ((message_length+2), size_string, 10);
 
+/*
     if (!(log_to_TCP(ip,port)))
         return 0;   //if error
-
+*/
     send_uart("AT+CIPSEND=");
     send_uart(size_string);
     //send_uart("\r\n");

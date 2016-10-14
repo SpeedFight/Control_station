@@ -239,7 +239,7 @@ uint8_t main_activity()
         .channel_id=talkback_id,
         .api_key=api_key
     };
-
+    thingspeak_init_struct(uart.send,&thingspeak);
     relay_typedef relay;    //configure relay
     relay_init_struct(&relay);
 #endif
@@ -261,7 +261,9 @@ while (1)
 
     while(1) //////////////////////////////////////////////////test
     {
-        uart.send(
+        uart.send("w petli\n\r");
+
+        uint8_t ans =atoi(
         esp.fnct_send_field_to_TCP_return_answer
         (thingspeak.send_request_talkback,
         thingspeak.talkback_request_message_length(),
@@ -269,6 +271,18 @@ while (1)
         port)
         );
 
+        if(ans==1)
+        {
+            uart.send("LED_on\n\r");
+        }
+        if(ans==2)
+        {
+            uart.send("LED_off\n\r");
+        }
+        if(ans==3)
+        {
+            uart.send("LED_toogle\n\r");
+        }
     }
 
     for(uint8_t i=0;i<4;i++)//wait loop ~1600ms
@@ -325,123 +339,4 @@ while (1)
     }
 }
 #endif
-
-#ifdef SENSOR
-    while(1)
-    {
-        wdt_enable(WDTO_2S);
-
-        for(uint8_t i=0;i<4;i++)//wait loop ~1600ms
-        {
-            wdt_reset();
-            _delay_ms(400);
-        }
-        //if(wait_minutes(1))
-        {
-            photoresistor.start_measure();
-            dht_gettemperaturehumidity(&tmp_temp,&tmp_hum);
-
-            if(!(no_temperature))
-            {
-                no_temperature=tmp_temp;
-                no_humidity=tmp_hum;
-            }
-            else
-            {
-                no_temperature=(no_temperature+tmp_temp)/2u;
-                no_humidity=(no_humidity+tmp_hum)/2u;
-            }
-            uart.send("minute++\n\r");
-            ile++;
-            wdt_reset();
-
-/*debug
-            itoa (no_temperature, str_temperature, 10);
-            itoa (no_humidity, str_humidity, 10);
-            light.field_value=photoresistor.get_brightness();
-            photoresistor.reset_average();
-            no_humidity=0;
-            no_temperature=0;
-
-
-            itoa (time.seconds, sec, 10);
-            itoa (time.minutes, min, 10);
-            itoa (time.hours, hou, 10);
-
-            uart.send("bright:");
-            uart.send(light.field_value);
-            uart.send(" temp:");
-            uart.send(temperature.field_value);
-            uart.send("*C hum:");
-            uart.send(humidity.field_value);
-            uart.send("%");
-
-            uart.send(" Time:");
-            uart.send(hou);
-            uart.send(":");
-            uart.send(min);
-            uart.send(":");
-            uart.send(sec);
-            uart.send(":");
-            uart.send("\n\r");
-            itoa (thingspeak.post_message_length(), tmppp, 10);
-            uart.send("size");
-            uart.send(tmppp);
-            thingspeak.send_post();
-            uart.send("\n\r");
-*/
-        }
-
-        //if(wait_hours(1))
-        if(ile>149u)//co 5min
-        {
-            ile=0;
-            itoa (no_temperature, str_temperature, 10);
-            itoa (no_humidity, str_humidity, 10);
-            light.field_value=photoresistor.get_brightness();
-            photoresistor.reset_average();
-            no_humidity=0;
-            no_temperature=0;
-
-            *uart.received_data_pack_flag=0;
-            uart.send("esp start\n\r");
-            esp.esp_on();
-
-            wdt_reset();
-            if((esp.reset_until_ready()))
-            {
-
-            }
-            wdt_reset();
-            wdt_disable();
-            *uart.received_data_pack_flag=0;
-
-            if(esp.test_ap())
-            {
-
-            }
-            *uart.received_data_pack_flag=0;
-
-            _delay_ms(1000);
-            if(esp.test_internet())
-            {
-
-            }
-            *uart.received_data_pack_flag=0;
-
-            wdt_enable(WDTO_2S);
-            if(esp.fnct_send_to_TCP(thingspeak.send_post,
-                thingspeak.post_message_length(),
-                "+IPD,",ip,port))
-                {
-
-                }
-
-
-            esp.esp_off();
-            uart.send("esp end\n\r");
-
-        }
-    }
-    #endif
 }
