@@ -34,9 +34,9 @@
 
 
 //led for signalization
-#define TX_PIN	4
+#define TX_PIN	7
 #define TX_PORT	D
-#define RX_PIN	3
+#define RX_PIN	5
 #define RX_PORT	D
 
 //DON'T CHANGE CODE BELLOW!!!//

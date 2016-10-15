@@ -256,9 +256,11 @@ uint8_t main_activity()
     uint8_t ile=0;
 #ifdef TALKBACK
 
-
+/*
 *uart.received_data_pack_flag=0;
 uart.send("esp start\n\r");
+
+ERROR:
 esp.esp_on();
 
 //wdt_reset();
@@ -270,7 +272,7 @@ if((esp.reset_until_ready()))
 //wdt_disable();
 *uart.received_data_pack_flag=0;
 
-esp.connect_to_wifi("Dziewczyny","031878");
+esp.connect_to_wifi("Dziewczyny","03154878");
 
 *uart.received_data_pack_flag=0;
 
@@ -285,8 +287,10 @@ if(esp.test_internet())
 {
 
 }
+else
+goto ERROR;
 *uart.received_data_pack_flag=0;
-
+*/
 
 while (1)
 {
@@ -302,7 +306,7 @@ while (1)
         ip,
         port)
         );
-
+sudo apt install llvm
         if(ans==1)
         {
             uart.send("LED_on\n\r");
@@ -316,7 +320,19 @@ while (1)
             uart.send("LED_toogle\n\r");
         }
     }
-*/
+    */
+    while(1)
+    {
+        _delay_ms(2000);
+        uart.send("test");
+        //relay.on();
+
+        _delay_ms(2000);
+        uart.send("test");
+        //relay.off();
+    }
+
+
         //wdt_reset();
         _delay_ms(500);
         ile++;

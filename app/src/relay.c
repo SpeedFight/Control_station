@@ -7,7 +7,7 @@
 #include "../inc/relay.h"
 
 //define relay pin
-#define RELAY_PIN	4
+#define RELAY_PIN	3
 #define RELAY_PORT	D
 
 //DON'T CHANGE CODE BELLOW!!!//
@@ -29,6 +29,7 @@
 
 static void configure_relay()
 {
+    RELAY_OFF;
     SET_DDR(RELAY_PORT) |=(1<<SET_PIN(RELAY_PIN));	//set pin as output
 }
 

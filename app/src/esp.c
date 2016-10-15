@@ -18,10 +18,10 @@
 
 #define MAX_TRY 5  //how many times resend message
 
-#define PIN_RESET	1
+#define PIN_RESET	2
 #define PORT_RESET	C
 
-#define PIN_CH_PD	0
+#define PIN_CH_PD	1
 #define PORT_CH_PD	C
 
 //DON'T CHANGE CODE BELLOW!!!//
@@ -443,10 +443,10 @@ char *port)
     static char answer[20];
     itoa ((message_length+2), size_string, 10);
 
-/*
+
     if (!(log_to_TCP(ip,port)))
         return 0;   //if error
-*/
+
     send_uart("AT+CIPSEND=");
     send_uart(size_string);
     //send_uart("\r\n");
