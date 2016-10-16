@@ -56,6 +56,9 @@ typedef struct{
      uint8_t (*talkback_request_message_length)();
      void (*send_request_talkback)();
 
+     uint8_t (*talkback_request_all_message_length)();
+     void (*send_request_all_talkback)();
+
 
  }thingspeak_typedef;
 

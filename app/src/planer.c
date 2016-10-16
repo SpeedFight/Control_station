@@ -255,12 +255,14 @@ uint8_t main_activity()
 
     uint8_t ile=0;
 #ifdef TALKBACK
+uint8_t relay_status=0;
+char *answer;
 
-/*
-*uart.received_data_pack_flag=0;
-uart.send("esp start\n\r");
+//relay.on();
+//_delay_ms(500);
+//relay.off();
 
-ERROR:
+ERROR2:
 esp.esp_on();
 
 //wdt_reset();
@@ -270,9 +272,9 @@ if((esp.reset_until_ready()))
 }
 //wdt_reset();
 //wdt_disable();
-*uart.received_data_pack_flag=0;
+//*uart.received_data_pack_flag=0;
 
-esp.connect_to_wifi("Dziewczyny","03154878");
+//esp.connect_to_wifi("Youkata","nicoyazawa");
 
 *uart.received_data_pack_flag=0;
 
@@ -288,82 +290,64 @@ if(esp.test_internet())
 
 }
 else
-goto ERROR;
+goto ERROR2;
 *uart.received_data_pack_flag=0;
-*/
 
-while (1)
+
+while(1)
 {
-/*
-    while(1) //////////////////////////////////////////////////test
-    {
-        uart.send("w petli\n\r");
-
-        uint8_t ans =atoi(
-        esp.fnct_send_field_to_TCP_return_answer
-        (thingspeak.send_request_talkback,
-        thingspeak.talkback_request_message_length(),
-        ip,
-        port)
-        );
-sudo apt install llvm
-        if(ans==1)
-        {
-            uart.send("LED_on\n\r");
-        }
-        if(ans==2)
-        {
-            uart.send("LED_off\n\r");
-        }
-        if(ans==3)
-        {
-            uart.send("LED_toogle\n\r");
-        }
-    }
-    */
-    while(1)
-    {
-        _delay_ms(2000);
-        uart.send("test");
-        //relay.on();
-
-        _delay_ms(2000);
-        uart.send("test");
-        //relay.off();
-    }
-
-
         //wdt_reset();
-        _delay_ms(500);
+        _delay_ms(1000);
         ile++;
 
-    if(ile>4u)//co 2sekudny
+    if(ile>5u)
     {
+
+        if(esp.test_internet())
+        {
+
+        }
+        //else
+        //goto ERROR2;
         ile=0;
 
         //wdt_enable(WDTO_2S);
-        uint8_t ans =atoi(
+        answer=
         esp.fnct_send_field_to_TCP_return_answer
         (thingspeak.send_request_talkback,
         thingspeak.talkback_request_message_length(),
         ip,
-        port)
-        );
+        port);
 
-        if(ans==1)
+        //uart.send("AT+CIPCLOSE\r\n");
+        uart.send("wysłano\r\n");
+        uart.send("odebrano\r\n");
+        uart.send(answer);
+
+        if(strstr(answer,"0x1"))
         {
-            uart.send("LED_on\n\r");
+            relay_status++;
+            uart.send("odp to 0x1\r\n");
+            //relay.on();
         }
-        if(ans==2)
+        if(strstr(answer,"0x2"))
         {
-            uart.send("LED_off\n\r");
-        }
-        if(ans==3)
-        {
-            uart.send("LED_toogle\n\r");
+            relay_status=0;
+            uart.send("odp to 0x2\r\n");
+            relay.off();
         }
 
+
+            if(relay_status)
+            relay.on();
+
+            if(!(relay_status));
+            relay.off();
+
+            uart.send("koniec petli\r\n");
     }
+    uart.send("poza petlo\r\n");
+
 }
 #endif
 }

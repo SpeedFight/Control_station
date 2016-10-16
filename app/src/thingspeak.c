@@ -46,6 +46,7 @@ thingspeak_typedef *thingspeak; //pointer to struct contain ip,port etc...
 #ifdef TALKBACK
     static const char thingsepak_talkback[]="/talkbacks/";
     static const char thingsepak_command_execute[]="/commands/execute?api_key=";
+    static const char thingsepak_command[]="/commands?api_key=";
 #endif
 static uint8_t (*uart_send)(char *message); //pointer to uart send function
 /** @}*/
@@ -250,6 +251,26 @@ static void send_request_talkback(void){
     uart_send(thingspeak->api_key);
 }
 
+//GET /talkbacks/<TALKBACK_ID>/commands?api_key=<YOUR_TALKBACK_API_KEY>
+static uint8_t talkback_request_all_message_length(){
+    uint8_t length;
+    length=size_of_string("GET ");
+    length+=size_of_string(thingsepak_talkback);
+    length+=size_of_string(thingspeak->channel_id);
+    length+=size_of_string(thingsepak_command);
+    length+=size_of_string(thingspeak->api_key);
+
+    return length;
+}
+static void send_request_all_talkback(void){
+    uart_send("GET ");
+    uart_send(thingsepak_talkback);
+    uart_send(thingspeak->channel_id);
+    uart_send(thingsepak_command);
+    uart_send(thingspeak->api_key);
+}
+
+
 void thingspeak_init_struct(void (*uart_send_function)(char *),
 thingspeak_typedef *thingspeak_struct)
 {
@@ -261,5 +282,8 @@ thingspeak_typedef *thingspeak_struct)
 
     thingspeak_struct->talkback_request_message_length=&talkback_request_message_length;
     thingspeak_struct->send_request_talkback=&send_request_talkback;
+
+    thingspeak_struct->talkback_request_all_message_length=&talkback_request_all_message_length;
+    thingspeak_struct->send_request_all_talkback=&send_request_all_talkback;
 
 }
