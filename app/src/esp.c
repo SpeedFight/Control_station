@@ -455,8 +455,8 @@ char *port)
 
     other_send_function();
 
-    return strcpy(answer,esp_accept_comand_return_answer("\r\n",2));
-    //return esp_accept_comand_return_answer("\r\n",2); //pointer to input buffer which collect specific answer given by thingspeak talkback
+    //return strcpy(answer,esp_accept_comand_return_answer("\r\n",2));
+    return esp_accept_comand_return_answer("\r\n",2); //pointer to input buffer which collect specific answer given by thingspeak talkback
 
 }
 

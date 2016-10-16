@@ -297,10 +297,10 @@ goto ERROR2;
 while(1)
 {
         //wdt_reset();
-        _delay_ms(1000);
+        _delay_ms(500);
         ile++;
 
-    if(ile>5u)
+    if(ile>19u)
     {
 
         if(esp.test_internet())
@@ -311,42 +311,47 @@ while(1)
         //goto ERROR2;
         ile=0;
 
+        *uart.received_data_pack_flag=0;
         //wdt_enable(WDTO_2S);
         answer=
         esp.fnct_send_field_to_TCP_return_answer
-        (thingspeak.send_request_talkback,
-        thingspeak.talkback_request_message_length(),
+        (thingspeak.send_request_all_talkback,
+        thingspeak.talkback_request_all_message_length(),
         ip,
         port);
 
         //uart.send("AT+CIPCLOSE\r\n");
-        uart.send("wysłano\r\n");
-        uart.send("odebrano\r\n");
-        uart.send(answer);
+        //uart.send("wysłano\r\n");
+        //uart.send("odebrano\r\n");
+        //uart.send(answer);
 
         if(strstr(answer,"0x1"))
         {
             relay_status++;
-            uart.send("odp to 0x1\r\n");
+            //uart.send("odp to 0x1\r\n");
             //relay.on();
         }
         if(strstr(answer,"0x2"))
         {
             relay_status=0;
-            uart.send("odp to 0x2\r\n");
-            relay.off();
+            //uart.send("odp to 0x2\r\n");
+            //relay.off();
         }
 
 
             if(relay_status)
-            relay.on();
+            {
+                relay.on();
+            }
 
-            if(!(relay_status));
-            relay.off();
+            if(!(relay_status))
+            {
+                relay.off();
+            }
 
-            uart.send("koniec petli\r\n");
+            //uart.send("koniec petli\r\n");
     }
-    uart.send("poza petlo\r\n");
+    //uart.send("poza petlo\r\n");
 
 }
 #endif
