@@ -1,21 +1,5 @@
-### (Atmega 8 | Esp8266) -> Wysyłanie danych do thingspeak
+### (Atmega 8 | Esp8266) -> Odbieranie danych z thingspeak talkback
 
-Korzystanie z komed AT
+Moduł do sterowania przekaźnikiem
 
-## TODO:
-- [x] Wysyłanie/odbiór uart
-- [x] Komunikacja z ESP8266
-- [x] Wysyłanie do thingspeak
-- [ ] Odbieranie z thingspeak
-- [ ] thingspeak talkback
-
-## Czujniki
-- [x] DT11
-- [x] Fotorezystor
-
-## Przyszłe
-- [ ] moduł włączający          (thingspeak talkback)
-- [ ] moduł do sterowania       (thingspeak talkback)
-- [ ] dodanie przyciskow        (thingspeak)
-- [ ] efektowane wykresy        (thingspeak)
-- [x] projekty płytek
+[x] schematy dodane
