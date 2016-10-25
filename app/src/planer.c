@@ -13,19 +13,12 @@
 #include "../inc/thingspeak.h"
 #include "../inc/planer.h"
 
-#if defined(CZUJNIK1) || defined(CZUJNIK2) || defined(CZUJNIK3)
-#include "../inc/photoresistor.h"
-#include "../inc/dht.h"
-#else
-    #include "../inc/relay.h"
-#endif
+
+#include "../inc/relay.h"
 
 #include <string.h>
 #include <stdlib.h>
 
-//#define CZUJNIK1
-//#define CZUJNIK2
-//#define CZUJNIK3
 #define TALKBACK
 
 //#define IRQ_TIMER
@@ -33,36 +26,12 @@
 const char ip[]="184.106.153.149";
 const char port[]="80";
 
-#ifdef CZUJNIK1
-    const char channel_id[]="143012";
-    const char api_key[]="8TPKDQ7OU004TBD5";
-#endif
-
-#ifdef CZUJNIK2
-    const char channel_id[]="164416";
-    const char api_key[]="TFLHHS8DBO3NRWRH";
-#endif
-
-#ifdef CZUJNIK3
-    const char channel_id[]="164417";
-    const char api_key[]="DKQUPX8IRUS6SHQJ";
-#endif
-
 #ifdef TALKBACK
     const char talkback_id[]="9837";
     const char api_key[]="G1PGOIQUKDE5182Y";
 
 #endif
 
-///
-
-#if defined(CZUJNIK1) || defined(CZUJNIK2) || defined(CZUJNIK3)
-static char str_temperature[4];
-static char str_humidity[4];
-
-int8_t no_temperature, no_humidity;
-int8_t tmp_temp, tmp_hum;
-#endif
 
 #ifdef IRQ_TIMER
     typedef struct
@@ -190,48 +159,7 @@ uint8_t main_activity()
             uart.received_data_pack_flag,
             &esp);
 
-#if defined(CZUJNIK1) || defined(CZUJNIK2) || defined(CZUJNIK3)
 
-    thingspeak_typedef thingspeak={
-        .ip=ip,
-        .port=port,
-        .channel_id=channel_id,
-        .api_key=api_key
-    };
-
-    //init photoresistor
-    photoresistor_typedef photoresistor;
-    photoresistor_init_struct(&photoresistor);
-    photoresistor.init();
-
-    #ifdef CZUJNIK1
-    data_field_typedef temperature=	{.field_no="1"};
-    data_field_typedef humidity=	{.field_no="2"};
-    data_field_typedef light=   	{.field_no="3"};
-    #endif
-
-    #ifdef CZUJNIK2
-    data_field_typedef temperature=	{.field_no="1"};
-    data_field_typedef humidity=	{.field_no="2"};
-    data_field_typedef light=   	{.field_no="3"};
-    #endif
-
-    #ifdef CZUJNIK3
-    data_field_typedef temperature=	{.field_no="1"};
-    data_field_typedef humidity=	{.field_no="2"};
-    data_field_typedef light=   	{.field_no="3"};
-    #endif
-
-    temperature.field_value=str_temperature;
-    humidity.field_value=str_humidity;
-
-    thingspeak_init_struct_and_data(uart.send,
-                            &thingspeak,
-                            &temperature,
-                            &humidity,
-                            &light);
-
-#else
 
     thingspeak_typedef thingspeak={
         .ip=ip,
@@ -242,7 +170,6 @@ uint8_t main_activity()
     thingspeak_init_struct(uart.send,&thingspeak);
     relay_typedef relay;    //configure relay
     relay_init_struct(&relay);
-#endif
 
 #ifdef IRQ_TIMER
     start_timer();
@@ -254,7 +181,6 @@ uint8_t main_activity()
     //char tmppp[4];
 
     uint8_t ile=0;
-#ifdef TALKBACK
 uint8_t relay_status=0;
 char *answer;
 
@@ -307,8 +233,6 @@ while(1)
         {
 
         }
-        //else
-        //goto ERROR2;
         ile=0;
 
         *uart.received_data_pack_flag=0;
@@ -320,22 +244,13 @@ while(1)
         ip,
         port);
 
-        //uart.send("AT+CIPCLOSE\r\n");
-        //uart.send("wysłano\r\n");
-        //uart.send("odebrano\r\n");
-        //uart.send(answer);
-
         if(strstr(answer,"0x1"))
         {
             relay_status++;
-            //uart.send("odp to 0x1\r\n");
-            //relay.on();
         }
         if(strstr(answer,"0x2"))
         {
             relay_status=0;
-            //uart.send("odp to 0x2\r\n");
-            //relay.off();
         }
 
 
@@ -349,10 +264,7 @@ while(1)
                 relay.off();
             }
 
-            //uart.send("koniec petli\r\n");
     }
-    //uart.send("poza petlo\r\n");
 
 }
-#endif
 }
